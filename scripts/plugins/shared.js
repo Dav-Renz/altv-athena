@@ -88,6 +88,7 @@ export function movePluginFilesToWebview(folderName, extensions, isSrc = false) 
                     fs.mkdirSync(folderPath, { recursive: true });
                 }
 
+                console.log(finalPath);
                 fs.copyFileSync(filePath, finalPath);
                 amountCopied += 1;
             }
@@ -95,4 +96,23 @@ export function movePluginFilesToWebview(folderName, extensions, isSrc = false) 
     }
 
     console.log(`${folderName} - ${amountCopied} Files Added to WebView Plugins - (${extensions.join('|')})`);
+}
+
+export function copyModFilesToOwnResource() {
+    const filePath = sanitizePath(path.join(process.cwd(), 'src', '**/mods/**').replace(/\\/g, '/'));
+
+    let filesToCopy = glob.sync(filePath, {
+        nodir: true,
+    });
+
+    for (const file of filesToCopy) {
+        const regExp = new RegExp(`.*\/plugins\/`);
+
+        const targetPath = file.replace('mods/', '').replace(regExp, 'resources/autocopied-mods/');
+
+        console.log(targetPath);
+        fs.copy(file, targetPath, { overwrite: true });
+    }
+
+    console.log(`ModMover - ${filesToCopy.length} Files copied to its own resource`);
 }

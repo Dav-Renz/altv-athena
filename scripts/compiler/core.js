@@ -75,7 +75,13 @@ function getFilesToCopy(enabledPlugins) {
 
     return glob.sync(filePath, {
         nodir: true,
-        ignore: ['**/tsconfig.json', '**/dependencies.json', `**/core/plugins/!(${enabledPlugins.join('|')})/**`],
+        ignore: [
+            '**/tsconfig.json',
+            '**/dependencies.json',
+            '**/mod/**',
+            '**/mods/**',
+            `**/core/plugins/!(${enabledPlugins.join('|')})/**`,
+        ],
     });
 }
 
