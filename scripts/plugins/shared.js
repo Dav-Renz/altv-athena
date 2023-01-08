@@ -99,20 +99,73 @@ export function movePluginFilesToWebview(folderName, extensions, isSrc = false) 
 }
 
 export function copyModFilesToOwnResource() {
-    const filePath = sanitizePath(path.join(process.cwd(), 'src', '**/mods/**').replace(/\\/g, '/'));
+    // First Perform Cleanup
 
-    let filesToCopy = glob.sync(filePath, {
-        nodir: true,
-    });
+    let oldFiles = glob.sync(sanitizePath(path.join(`resources/mods/autocopied-mods/**/*.*`)));
 
-    for (const file of filesToCopy) {
-        const regExp = new RegExp(`.*\/plugins\/`);
+    for (let oldFile of oldFiles) {
+        //console.log('Old file path: ' + oldFile);
+        if (fs.existsSync(oldFile)) {
+            fs.rmSync(oldFile, { force: true });
+        }
 
-        const targetPath = file.replace('mods/', '').replace(regExp, 'resources/autocopied-mods/');
-
-        console.log(targetPath);
-        fs.copy(file, targetPath, { overwrite: true });
+        const directory = sanitizePath(path.dirname(oldFile));
+        if (fs.existsSync(directory)) {
+            const files = fs.readdirSync(directory);
+            if (files.length <= 0) {
+                fs.rmdirSync(directory);
+            }
+        }
     }
 
-    console.log(`ModMover - ${filesToCopy.length} Files copied to its own resource`);
+    // Next Scan Available Plugins
+
+    const enabledPlugins = getEnabledPlugins();
+
+    // Set available Mod Types
+    const modTypes = ['maps', 'vehicles', 'cloths'];
+
+    let amountCopied = 0;
+    // Go trough each plugin
+    for (const pluginName of enabledPlugins) {
+        const pluginFolder = sanitizePath(path.join(process.cwd(), `src/core/plugins/`, pluginName));
+
+        // Check if the plugin folder exists and if it has a 'mods' folder
+        if (!fs.existsSync(sanitizePath(pluginFolder))) {
+            continue;
+        }
+        if (!fs.existsSync(sanitizePath(path.join(pluginFolder, '/mods')))) {
+            continue;
+        }
+
+        //go through each existing Mod Type folder
+        let modsExist = false;
+        for (const modType of modTypes) {
+            if (!fs.existsSync(sanitizePath(path.join(pluginFolder, `/mods/${modType}`)))) {
+                continue;
+            }
+            modsExist = true;
+
+            const regExp = new RegExp(`.*\/mods\/${modType}\/`);
+
+            const allModTypeFiles = glob.sync(
+                sanitizePath(path.join(pluginFolder, `/mods/${modType}/**`).replace(/\\/g, '/')),
+                {
+                    nodir: true,
+                },
+            );
+
+            for (const file of allModTypeFiles) {
+                const targetPath = file.replace(regExp, `resources/mods/autocopied-mods/${modType}/${pluginName}/`);
+
+                console.log(targetPath);
+                fs.copy(file, targetPath, { overwrite: true });
+                amountCopied += 1;
+            }
+        }
+        if (!modsExist) {
+            console.log(`No mod-subfolders found in ${pluginName}`);
+        }
+    }
+    console.log(`ModMover - ${amountCopied} Files copied to mods folder`);
 }

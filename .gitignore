@@ -47,3 +47,4 @@ yarn.lock
 # Resources
 resources/core/**
 resources/webviews/**
+resources/mods/autocopied-mods/**
