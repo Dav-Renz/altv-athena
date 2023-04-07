@@ -130,3 +130,34 @@ export function movePluginFilesToWebview(folderName, extensions, isSrc = false) 
         }
     }
 }
+
+export function moveAssetsToMods(folderName) {
+    console.log(`modMover called, foldername: ${folderName}`);
+    const enabledPlugins = getEnabledPlugins();
+    let amountCopied = 0;
+    for (const pluginName of enabledPlugins) {
+        const pluginFolder = sanitizePath(path.join(process.cwd(), `src/core/plugins/`, pluginName));
+        if (!fs.existsSync(sanitizePath(path.join(pluginFolder, `mods`, folderName)))) {
+            continue;
+        }
+
+        const fullPath = sanitizePath(path.join(pluginFolder, `mods/${folderName}/**/*`));
+        const allFiles = glob.sync(fullPath);
+
+        for (let i = 0; i < allFiles.length; i++) {
+            const filePath = allFiles[i];
+            const regExp = new RegExp(`.*\/${folderName}\/`);
+            const finalPath = sanitizePath(
+                filePath.replace(regExp, `resources/mods/automatic/${folderName}/${pluginName}/`),
+            );
+            console.log(finalPath);
+            const folderPath = sanitizePath(path.dirname(finalPath));
+            if (!fs.existsSync(folderPath)) {
+                fs.mkdirSync(folderPath, { recursive: true });
+            }
+
+            fs.copyFileSync(filePath, finalPath);
+            amountCopied += 1;
+        }
+    }
+}

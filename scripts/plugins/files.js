@@ -1,4 +1,9 @@
-import { moveAssetsToWebview, movePluginFilesToWebview, clearPluginsWebViewFolder } from './shared.js';
+import {
+    moveAssetsToWebview,
+    movePluginFilesToWebview,
+    clearPluginsWebViewFolder,
+    moveAssetsToMods,
+} from './shared.js';
 
 function run() {
     clearPluginsWebViewFolder();
@@ -24,6 +29,8 @@ function run() {
         'otf',
         'ttf',
     ]);
+    moveAssetsToMods('map');
+    moveAssetsToMods('vehicle');
 }
 
 run();
