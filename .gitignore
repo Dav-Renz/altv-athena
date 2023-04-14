@@ -48,5 +48,8 @@ yarn.lock
 # Resources
 resources/core/**
 resources/webviews/**
+resources/gitignore/**
+resources/mods/gitignore/**
+
 
 typedefs.d.ts

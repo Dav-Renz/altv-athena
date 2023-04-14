@@ -17,19 +17,9 @@
     "timeout": 1,
     "announceRetryErrorDelay": 10000,
     "announceRetryErrorAttempts": 50,
-    "modules": [
-        "js-module"
-    ],
-    "resources": [
-        "webviews",
-        "core"
-    ],
-    "tags": [
-        "athena",
-        "framework",
-        "version",
-        "3"
-    ],
+    "modules": ["js-module"],
+    "resources": ["webviews", "core", "gitignore/vehicles/sandkings", "gitignore/vehicles/brute-retro"],
+    "tags": ["athena", "framework", "version", "3"],
     "useEarlyAuth": false,
     "earlyAuthUrl": null,
     "useCdn": false,
